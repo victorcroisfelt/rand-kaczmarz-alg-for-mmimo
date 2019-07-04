@@ -1,1 +1,1 @@
-# rand-kaczmarz-alg-based-proc-schemes-for-mmimo
+# Randomized Kaczmarz Algorithm for Massive MIMO Systems with Channel Estimation and Spatial Correlation
