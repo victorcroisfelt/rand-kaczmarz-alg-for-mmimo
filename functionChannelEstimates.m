@@ -1,4 +1,4 @@
-function [Hhat_LS,tau_p,H,Hhat_MMSE] = functionChannelEstimates(M,K,p,R,channelGaindB,numRealizations)
+function [H,Hhat_LS,Hhat_MMSE,tau_p] = functionChannelEstimates(M,K,p,R,channelGaindB,numRealizations)
 % Compute the channel estimates by adopting both the LS and MMSE channel
 % estimation approaches. Here, the pilot training phase of a Massive MIMO
 % network comprised of a BS equipped with M antennas and serving K UEs is
@@ -11,8 +11,8 @@ function [Hhat_LS,tau_p,H,Hhat_MMSE] = functionChannelEstimates(M,K,p,R,channelG
 % This Matlab function is used in the articles:
 %
 % Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão,
-% "Kaczmarz Precoding and Detection for Massive MIMO Systems", IEEE 
-% Wireless Communications and Networking Conference, Marrakech, Morroco, 
+% "Kaczmarz Precoding and Detection for Massive MIMO Systems", IEEE
+% Wireless Communications and Networking Conference, Marrakech, Morroco,
 % 2019: 1-6.
 %
 % Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão,
@@ -34,14 +34,14 @@ function [Hhat_LS,tau_p,H,Hhat_MMSE] = functionChannelEstimates(M,K,p,R,channelG
 %   - numRealizations: number of small-scale fading realizations.
 %
 %Output:
+%   - H: M x nbrOfRealizations x K matrix with the true channel values.
 %   - Hhat_LS: M x nbrOfRealizations x K matrix with the channel estimates
 %   when adopting the LS channel estimator.
-%   - tau_p: length of the pilot training phase.
-%   - H: M x nbrOfRealizations x K matrix with the true channel values.
 %   - Hhat_MMSE: M x nbrOfRealizations x K matrix with the channel
 %   estimates when adopting the MMSE channel estimator.
+%   - tau_p: length of the pilot training phase.
 %
-% This is version 4.0 (Last edited: 2019-04-07)
+% This is version 5.0 (Last edited: 2019-15-07)
 %
 % License: This code is licensed under the MIT license. If you in any way
 % use this code for research that results in publications, please reference
@@ -87,18 +87,11 @@ eyeM = eye(M);
 % Length of the pilot sequences [samples]
 tau_p = K;
 
-% Prepare to store LS channel estimates
+% Prepare to store the different channel estimates
 Hhat_LS = zeros(M,numRealizations,K);
+Hhat_MMSE = zeros(M,numRealizations,K);
 
-% Check for MMSE channel estimation
-if nargout > 3
-    
-    % Prepare to store MMSE channel estimates
-    Hhat_MMSE = zeros(M,numRealizations,K);
-    
-end
-
-%Generate realizations of normalized noise (AWGN)
+% Generate realizations of normalized noise (AWGN)
 Np = sqrt(0.5)*(randn(M,numRealizations,K)+1i*randn(M,numRealizations,K));
 
 %% Compute processed pilot signal for all UEs
@@ -111,17 +104,12 @@ for k = 1:K
     A_LS = 1/(sqrt(p)*tau_p);
     Hhat_LS(:,:,k) = A_LS*yp(:,:,k);
     
-    % MMSE channel estimation
-    if nargout > 3
-        
-        % Compute the matrix that is inverted in the MMSE estimator
-        PsiInv = (p*tau_p*R(:,:,k) + eyeM);
-        
-        % Compute the MMSE estimate of the channel between the BS and UE k
-        RPsi = R(:,:,k)/PsiInv;
-        Hhat_MMSE(:,:,k) = sqrt(p)*RPsi*yp(:,:,k);
-        
-    end
+    % Compute the matrix that is inverted in the MMSE estimator
+    PsiInv = (p*tau_p*R(:,:,k) + eyeM);
+    
+    % Compute the MMSE estimate of the channel between the BS and UE k
+    RPsi = R(:,:,k)/PsiInv;
+    Hhat_MMSE(:,:,k) = sqrt(p)*RPsi*yp(:,:,k);
     
 end
 

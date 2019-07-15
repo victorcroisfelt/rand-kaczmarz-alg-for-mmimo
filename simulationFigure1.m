@@ -13,7 +13,7 @@
 %
 %                   https://arxiv.org/abs/1904.04376
 %
-% This is version 4.0 (Last edited: 2019-04-07)
+% This is version 5.0 (Last edited: 2019-15-07)
 %
 % License: This code is licensed under the MIT license. If you in any way
 % use this code for research that results in publications, please reference
@@ -71,7 +71,7 @@ noiseVariancedBm = -174 + 10*log10(B) + noiseFigure;
 %% Simulation
 
 % Prepare to save simulation results
-logSampleProb = zeros(K,numSetups,2,3,length(alphaRange));
+logSampleProb = zeros(K,numSetups,3,2,length(alphaRange));
 
 % Go through all simulations points
 for alpha = 1:length(alphaRange)
@@ -82,7 +82,7 @@ for alpha = 1:length(alphaRange)
     for s = 1:numSetups
         
         % Output simulation progress
-        disp([num2str(s) ' setups out of ' num2str(numSetups)]);
+        disp([num2str(s) ' setup out of ' num2str(numSetups)]);
         
         % Compute the setup characteristics
         [Runcorr,Rcorr,channelGaindB] = functionSetup(M,K,correlationFactor,stdLSF,alphaRange(alpha));
@@ -97,38 +97,38 @@ for alpha = 1:length(alphaRange)
             if chn == 1
                 
                 % Compute the channel estimates
-                [Hhat_LS,~,H,Hhat_MMSE] = functionChannelEstimates(M,K,p,Runcorr,channelGainOverNoise,numRealizations);
+                [H,Hhat_LS,Hhat_MMSE,~] = functionChannelEstimates(M,K,p,Runcorr,channelGainOverNoise,numRealizations);
                 
             else
                 
                 % Compute the channel estimates
-                [Hhat_LS,~,H,Hhat_MMSE] = functionChannelEstimates(M,K,p,Rcorr,channelGainOverNoise,numRealizations);
+                [H,Hhat_LS,Hhat_MMSE,~] = functionChannelEstimates(M,K,p,Rcorr,channelGainOverNoise,numRealizations);
                 
             end
             
-            % Go through channel realizations
+            % Go through all channel realizations
             for n = 1:numRealizations
                 
-                % Extract the channel estimate realizations from all users
-                % to the BS
-                Hall = reshape(H(:,n,:),[M K]);
-                Hall_LS = reshape(Hhat_LS(:,n,:),[M K]);
-                Hall_MMSE = reshape(Hhat_MMSE(:,n,:),[M K]);
-                
-                % Define the sample probability function
-                sampleProbability = @(col) (norm(Hall(:,col))^2 + (1/p))/(norm(Hall,'fro')^2 + (K/p));
-                sampleProbability_LS = @(col) (norm(Hall_LS(:,col))^2 + (1/p))/(norm(Hall_LS,'fro')^2 + (K/p));
-                sampleProbability_MMSE = @(col) (norm(Hall_MMSE(:,col))^2 + (1/p))/(norm(Hall_MMSE,'fro')^2 + (K/p));
+                % Extract channel estimate realizations from all UEs to the 
+                % BS
+                Hall(:,:,1) = reshape(H(:,n,:),[M K]);
+                Hall(:,:,2) = reshape(Hhat_LS(:,n,:),[M K]);
+                Hall(:,:,3) = reshape(Hhat_MMSE(:,n,:),[M K]);
+    
+                % Define the function to compute the sample probability
+                sampleProbability = @(col) ((norm(Hall(:,col,1))^2) + (1/p))/((norm(Hall(:,:,1),'fro')^2) + (K/p));
+                sampleProbability_LS = @(col) ((norm(Hall(:,col,2))^2) + (1/p))/((norm(Hall(:,:,2),'fro')^2) + (K/p));
+                sampleProbability_MMSE = @(col) ((norm(Hall(:,col,3))^2) + (1/p))/((norm(Hall(:,:,3),'fro')^2) + (K/p));
                 
                 % Compute the PDFs
-                pdfRowsRZF = arrayfun(sampleProbability,(1:K)');
-                pdfRowsRZF_LS = arrayfun(sampleProbability_LS,(1:K)');
-                pdfRowsRZF_MMSE = arrayfun(sampleProbability_MMSE,(1:K)');
+                pdfRowsRZF(:,:,1) = arrayfun(sampleProbability,(1:K)');
+                pdfRowsRZF(:,:,2) = arrayfun(sampleProbability_LS,(1:K)');
+                pdfRowsRZF(:,:,3) = arrayfun(sampleProbability_MMSE,(1:K)');
                 
                 % Save the pdf average value
-                logSampleProb(:,s,chn,1,alpha) = logSampleProb(:,s,chn,1,alpha) + pdfRowsRZF/numRealizations;
-                logSampleProb(:,s,chn,2,alpha) = logSampleProb(:,s,chn,2,alpha) + pdfRowsRZF_LS/numRealizations;
-                logSampleProb(:,s,chn,3,alpha) = logSampleProb(:,s,chn,3,alpha) + pdfRowsRZF_MMSE/numRealizations;
+                logSampleProb(:,s,1,chn,alpha) = logSampleProb(:,s,1,chn,alpha) + pdfRowsRZF(:,:,1)/numRealizations;
+                logSampleProb(:,s,2,chn,alpha) = logSampleProb(:,s,2,chn,alpha) + pdfRowsRZF(:,:,2)/numRealizations;
+                logSampleProb(:,s,3,chn,alpha) = logSampleProb(:,s,3,chn,alpha) + pdfRowsRZF(:,:,3)/numRealizations;
                 
             end
             
@@ -139,7 +139,7 @@ for alpha = 1:length(alphaRange)
 end
 
 % Reshape data & sort the data
-reshap = reshape(logSampleProb,[K*numSetups,2,3,length(alphaRange)]);
+reshap = reshape(logSampleProb,[K*numSetups,3,2,length(alphaRange)]);
 sorted = sort(reshap,1);
 
 %% Plot simulation results
@@ -151,11 +151,11 @@ y = linspace(0,1,K*numSetups);
 
 % Legend plots
 plot(sorted(1,1,1,1),y(1),'k--','LineWidth',1) % Uncorrelated
-plot(sorted(1,2,1,1),y(1),'k-.','LineWidth',1) % Correlated
+plot(sorted(1,1,2,1),y(1),'k-.','LineWidth',1) % Correlated
 
 plot(sorted(1,1,1,1),y(1),'ks','LineWidth',1) % True channel
-plot(sorted(1,1,2,1),y(1),'ko','LineWidth',1) % LS
-plot(sorted(1,1,3,1),y(1),'kd','LineWidth',1) % MMSE
+plot(sorted(1,2,1,1),y(1),'ko','LineWidth',1) % LS
+plot(sorted(1,3,1,1),y(1),'kd','LineWidth',1) % MMSE
 
 % Defining a vector with the positions where the markers will be placed
 markers = round(linspace(1,K*numSetups,10));
@@ -186,9 +186,9 @@ for alpha = 1:length(alphaRange)
             end
             
             % Plotting process
-            plot(sorted(:,chn,est,alpha),y,str,'LineWidth',1) 
+            plot(sorted(:,est,chn,alpha),y,str,'LineWidth',1) 
             ax.ColorOrderIndex = ax.ColorOrderIndex-1;
-            plot(sorted(markers,chn,est,alpha),y(markers),markersStr(est),'LineWidth',1)
+            plot(sorted(markers,est,chn,alpha),y(markers),markersStr(est),'LineWidth',1)
             
         end
         

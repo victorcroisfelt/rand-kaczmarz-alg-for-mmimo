@@ -18,6 +18,11 @@ function [Runcorr,Rcorr,channelGaindB] = functionSetup(M,K,correlationFactor,std
 % This Matlab function is used in the articles:
 %
 % Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão,
+% "Kaczmarz Precoding and Detection for Massive MIMO Systems", IEEE 
+% Wireless Communications and Networking Conference, Marrakech, Morroco, 
+% 2019: 1-6.
+%
+% Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão,
 % "Randomized Kaczmarz Algorithm for Massive MIMO Systems with Channel
 % Estimation and Spatial Correlation", to appear, 2019.
 %
@@ -42,7 +47,7 @@ function [Runcorr,Rcorr,channelGaindB] = functionSetup(M,K,correlationFactor,std
 %   - channelGaindB: a K x 1 vector with the power of the K UEs connected
 %     to the BS.
 %
-% This is version 4.0 (Last edited: 2019-04-07)
+% This is version 5.0 (Last edited: 2019-15-07)
 %
 % License: This code is licensed under the MIT license. If you in any way
 % use this code for research that results in publications, please reference
@@ -67,14 +72,14 @@ if nargin < 5
 end
 
 % Average channel gain in dB at a reference distance of 1 meter. Note that
-% -35.3 dB corresponds to -148.1 dB at 1 km, using pathloss exponent 3.76
+% -35.3 dB corresponds to -148.1 dB at 1 km, using pathloss exponent 3.76.
 constantTerm = -35.3;
 
 % Minimum distance between BSs and UEs
 minDistance = 35;
 
-% Deploy BSs on the grid
-BSpositions = squareLength/2 + 1i*squareLength/2;
+% Deploy the BS on the grid
+BSposition = squareLength/2 + 1i*squareLength/2;
 
 % Prepare to put out UEs in the cell
 UEpositions = zeros(K,1);
@@ -127,21 +132,21 @@ while perBS < K
     posXY = posXY(abs(posXY) >= minDistance);
     
     % Store new UEs
-    UEpositions(perBS+1:perBS+length(posXY)) = posXY + BSpositions;
+    UEpositions(perBS+1:perBS+length(posXY)) = posXY + BSposition;
     perBS = perBS + length(posXY);
     
 end
 
 % Compute distances between UEs and the BS
-distancesBSj = abs(UEpositions - BSpositions);
+distancesBSj = abs(UEpositions - BSposition);
 
 % Compute angles between UEs and the BS
-angleBSj = angle(UEpositions - BSpositions);
+angleBSj = angle(UEpositions - BSposition);
 
 % Compute distant-dependent path gains (in dB)
 channelGaindB = constantTerm - alpha*10*log10(distancesBSj);
 
-% Generate the spatial covariance matrices of all UEs
+%% Generate the spatial covariance matrices of all UEs
 for k = 1:K
     
     % Check aux variable:
@@ -177,7 +182,7 @@ for k = 1:K
             % Generate the covariance matrix using the exponential
             % correlation model, including large-scale fading variations
             % over the array
-            Rcorr(:,:,k) = largeScaleFadingD*toeplitz((correlationFactor(r)*exp(1i*angleBSj(k))).^(0:M-1))*largeScaleFadingD;
+            Rcorr(:,:,k,r) = largeScaleFadingD*toeplitz((correlationFactor(r)*exp(1i*angleBSj(k))).^(0:M-1))*largeScaleFadingD;
             
         end
         
@@ -196,7 +201,7 @@ for k = 1:K
             % Generate the covariance matrix using the exponential
             % correlation model, including large-scale fading variations
             % over the array
-            Rcorr(:,:,k,l) = largeScaleFadingD*toeplitz((correlationFactor*exp(1i*angleBSj(k))).^(0:M-1))*largeScaleFadingD;
+            Rcorr(:,:,k,r) = largeScaleFadingD*toeplitz((correlationFactor*exp(1i*angleBSj(k))).^(0:M-1))*largeScaleFadingD;
             
         end
         
