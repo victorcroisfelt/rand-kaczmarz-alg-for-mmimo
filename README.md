@@ -5,7 +5,7 @@ This is a research-oriented code package that is primarily intended to allow rea
 Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão, "Kaczmarz Precoding and Detection for Massive MIMO Systems,"
 IEEE Wireless Communications and Networking Conference,, pp. 1–6, Marrakech, Morroco, 2019. Publication is expected soon.
 
-Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão, "[Randomized Kaczmarz Algorithm for Massive MIMO Systems with Channel Estimation and Spatial Correlation](https://arxiv.org/abs/1904.04376)", To Appear, 2019. Already available on arXiv.org.
+Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão, "[Randomized Kaczmarz Algorithm for Massive MIMO Systems with Channel Estimation and Spatial Correlation](https://doi.org/10.1002/dac.4158)", Wiley International Journal of Communication Systems, 2019;e4158. Also available in arXiv: https://arxiv.org/abs/1904.04376.
 
 The package is based on the Matlab language and can, in fact, reproduce all the numerical results and figures discussed in the article. To contextualize, in the sequel, we present the abstract of the article and other important information.
 
