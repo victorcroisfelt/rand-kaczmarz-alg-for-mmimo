@@ -9,7 +9,7 @@ Victor Croisfelt Rodrigues, José Carlos Marinello Filho, and Taufik Abrão, "[R
 
 The package is based on the Matlab language and can, in fact, reproduce all the numerical results and figures discussed in the article. To contextualize, in the sequel, we present the abstract of the article and other important information.
 
-I hope this content helps in your reaseach and contributes to building the precepts behind open science. Remarkably, in order to boost the idea of open science and further drive the evolution of science, we also motivate you to share your published results to the public.
+I hope this content helps in your research and contributes to building the precepts behind open science. Remarkably, in order to boost the idea of open science and further drive the evolution of science, we also motivate you to share your published results to the public.
 
 If you have any questions and if you have encountered any inconsistency, please do not hesitate to contact me via victorcroisfelt@gmail.com.
 
