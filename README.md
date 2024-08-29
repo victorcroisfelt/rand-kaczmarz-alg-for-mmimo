@@ -27,16 +27,16 @@ This code is subject to the MIT license. If you use any part of this repository 
 
 ```bibtex
 @article{https://doi.org/10.1002/dac.4158,
-author = {Rodrigues, Victor Croisfelt and Marinello Filho, José Carlos and Abrão, Taufik},
-title = {Randomized Kaczmarz algorithm for massive MIMO systems with channel estimation and spatial correlation},
-journal = {International Journal of Communication Systems},
-volume = {32},
-number = {18},
-pages = {e4158},
-keywords = {combining, computational complexity, Kaczmarz algorithm, massive MIMO, precoding},
-doi = {https://doi.org/10.1002/dac.4158},
-url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/dac.4158},
-eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/dac.4158},
-note = {e4158 dac.4158},
-year = {2019}
+  author = {Rodrigues, Victor Croisfelt and Marinello Filho, José Carlos and Abrão, Taufik},
+  title = {Randomized Kaczmarz algorithm for massive MIMO systems with channel estimation and spatial correlation},
+  journal = {International Journal of Communication Systems},
+  volume = {32},
+  number = {18},
+  pages = {e4158},
+  keywords = {combining, computational complexity, Kaczmarz algorithm, massive MIMO, precoding},
+  doi = {https://doi.org/10.1002/dac.4158},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/dac.4158},
+  eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1002/dac.4158},
+  note = {e4158 dac.4158},
+  year = {2019}
 }
